@@ -1,9 +1,11 @@
 import express, { Request, Response } from 'express';
-import { placesRoutes } from '../routes/places-routes';
 import { HttpError } from '../models/http-error';
 import bodyParser from 'body-parser';
 import { error } from 'console';
 import { userRoutes } from '../routes/users-routes';
+import { placesRoutes } from '../routes/places-routes';
+import { productsRoutes } from '../routes/products-routes';
+
 
 const app = express();
 const port = 5000;
@@ -16,6 +18,7 @@ app.get('/', (req: Request , res: Response) => {
 
 app.use('/api/places/', placesRoutes);
 app.use('/api/users/', userRoutes);
+app.use('/api/products/', productsRoutes);
 
 app.use((req, res, next) => {
     const error = new HttpError('Could not find this route.', 404);
