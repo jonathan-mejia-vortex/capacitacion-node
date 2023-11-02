@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { Product } from "../../models/product";
+import { MONGO_DB_PW } from "../../utils/keys";
 
-const url = 'mongodb+srv://alejozonta:Y8DSwqWtLKlnWCqa@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
+const url = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
 
 mongoose.connect(url)
     .then(() => {
