@@ -4,13 +4,13 @@ import { MONGO_DB_PW } from "../../utils/keys";
 
 const url = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
 
-mongoose.connect(url)
-    .then(() => {
-        console.log('Connected to database!')
-    })
-    .catch(() => {
-        console.log('Connection failed!')
-    });
+// mongoose.connect(url)
+//     .then(() => {
+//         console.log('Connected to database!')
+//     })
+//     .catch(() => {
+//         console.log('Connection failed!')
+//     });
 
 export const createProduct2 = async (req, res, next) => {
     const createdProduct = new Product({

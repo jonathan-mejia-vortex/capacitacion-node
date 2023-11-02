@@ -1,11 +1,13 @@
 import express, { Request, Response } from 'express';
 import { HttpError } from '../models/http-error';
 import bodyParser from 'body-parser';
-import { error } from 'console';
 import { userRoutes } from '../routes/users-routes';
 import { placesRoutes } from '../routes/places-routes';
 import { productsRoutes } from '../routes/products-routes';
+import mongoose from 'mongoose';
+import { MONGO_DB_PW } from './../utils/keys';
 
+const URL = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
 
 const app = express();
 const port = 5000;
@@ -34,6 +36,16 @@ app.use((error, req, res, next) => {
   res.json({message: error.message || 'An unknown error ocurred!'});
 });
 
-app.listen(port, () => {
-  return console.log(`Listening at http://localhost:${port}`);
-});
+mongoose.connect(URL)
+    .then(() => {
+        console.log('Connected to database!')
+        app.listen(port, () => {
+          return console.log(`Listening at http://localhost:${port}`);
+        });
+    })
+    .catch(() => {
+        console.log('Connection failed!')
+    });
+
+
+
