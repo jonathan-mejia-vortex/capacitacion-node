@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 const placeSchema = new mongoose.Schema({
     title: {
@@ -27,5 +27,24 @@ const placeSchema = new mongoose.Schema({
         ref: 'User'
     },
 });
+
+
+
+
+@Entity()
+export class User {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
+    firstName: string
+
+    @Column()
+    lastName: string
+
+    @Column()
+    age: number
+}
+
 
 export const Place = mongoose.model('Place', placeSchema);

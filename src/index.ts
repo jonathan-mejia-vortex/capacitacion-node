@@ -4,10 +4,10 @@ import bodyParser from 'body-parser';
 import { userRoutes } from '../routes/users-routes';
 import { placesRoutes } from '../routes/places-routes';
 import { productsRoutes } from '../routes/products-routes';
-import mongoose from 'mongoose';
+import "reflect-metadata";
 import { MONGO_DB_PW } from './../utils/keys';
 
-const URL = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
+const URL = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/mern?retryWrites=true&w=majority';
 
 const app = express();
 const port = 5000;
