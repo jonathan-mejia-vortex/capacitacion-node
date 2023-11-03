@@ -1,4 +1,4 @@
-import { HttpError } from '../models/http-error';
+import { HttpError } from './http-error';
 
 export async function getCoordsForAdress(address: string) {
     const data = { lat: 40.75846, lng: -73.79845 }; //response.data

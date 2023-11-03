@@ -1,12 +1,13 @@
-import { HttpError } from '../models/http-error';
+import { AppDataSource } from '../src/data-source';
+import { User } from '../src/entity/User';
+import { HttpError } from '../src/utils/http-error';
 import { validationResult } from "express-validator";
-import { User } from '../models/user';
 
 
 export const getUsers = async (req, res, next) => {
     let users;
     try {
-        users = await User.find({}, '-password');
+        users = await AppDataSource.mongoManager.find(User);
     } catch (error) {
         const errorHttp = new HttpError(
             'Fetching users failed, please try again later', 500
@@ -18,7 +19,7 @@ export const getUsers = async (req, res, next) => {
         const errorHttp = new HttpError('Could not find users.', 404);
         return next(errorHttp);
     } 
-    res.json({users: users.map(user => user.toObject({getters: true}))});
+    res.json({users});
 };
 
 export const signup = async (req, res, next) => {
@@ -30,10 +31,10 @@ export const signup = async (req, res, next) => {
     
     let existingUser;
     try {
-        existingUser = await User.findOne({email: email});
+        existingUser = await AppDataSource.mongoManager.findOneBy(User, { email: email});
     } catch (error) {
         const errorHttp = new HttpError(
-            'Signning up failed, please try again later', 500
+            'Signning up failed, please try again later' + error, 500
         );
         return next(errorHttp);
     }
@@ -44,32 +45,30 @@ export const signup = async (req, res, next) => {
         return next(errorHttp);
     }
 
-    const createdUser = new User({
-        name,
-        email,
-        password,
-        image: 'image',
-        places: [],
-    });
+    const createdUser = new User();   
+    createdUser.name = name;
+    createdUser.email = email;
+    createdUser.password = password;
+    createdUser.image = 'image';
 
     try {
-        await createdUser.save();
+        await AppDataSource.mongoManager.save(createdUser);
     } catch (error) {
         const errorHttp = new HttpError(
-            'Signing up failed, please try again', 500
+            'Signing up failed, please try again' + error, 500
         );
         return next(errorHttp);
     }
 
-    res.status(200).json({user: createdUser.toObject( { getters: true})});
+    res.status(200).json({createdUser});
 };
-
 export const login = async (req, res, next) => {
+
     const { email, password } = req.body; 
 
     let identifiedUser;
     try {
-        identifiedUser = await User.findOne({email: email});
+        identifiedUser = await AppDataSource.mongoManager.findOneBy(User, {email: email});
     } catch (error) {
         const errorHttp = new HttpError(
             'Logging up failed, please try again later', 500

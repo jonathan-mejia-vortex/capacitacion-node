@@ -1,13 +1,10 @@
 import express, { Request, Response } from 'express';
-import { HttpError } from '../models/http-error';
+import { HttpError } from './utils/http-error';
 import bodyParser from 'body-parser';
 import { userRoutes } from '../routes/users-routes';
 import { placesRoutes } from '../routes/places-routes';
-import { productsRoutes } from '../routes/products-routes';
+import { AppDataSource } from './data-source';
 import "reflect-metadata";
-import { MONGO_DB_PW } from './../utils/keys';
-
-const URL = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/mern?retryWrites=true&w=majority';
 
 const app = express();
 const port = 5000;
@@ -20,7 +17,6 @@ app.get('/', (req: Request , res: Response) => {
 
 app.use('/api/places/', placesRoutes);
 app.use('/api/users/', userRoutes);
-app.use('/api/products/', productsRoutes);
 
 app.use((req, res, next) => {
     const error = new HttpError('Could not find this route.', 404);
@@ -36,16 +32,15 @@ app.use((error, req, res, next) => {
   res.json({message: error.message || 'An unknown error ocurred!'});
 });
 
-mongoose.connect(URL)
+AppDataSource.initialize()
     .then(() => {
-        console.log('Connected to database!')
+        // here you can start to work with your database
         app.listen(port, () => {
           return console.log(`Listening at http://localhost:${port}`);
         });
     })
-    .catch(() => {
-        console.log('Connection failed!')
-    });
+    .catch((error) => console.log(error))
+
 
 
 
