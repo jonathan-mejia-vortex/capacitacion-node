@@ -50,6 +50,7 @@ export const signup = async (req, res, next) => {
     createdUser.email = email;
     createdUser.password = password;
     createdUser.image = 'image';
+    createdUser.places = [];
 
     try {
         await AppDataSource.mongoManager.save(createdUser);
@@ -62,6 +63,7 @@ export const signup = async (req, res, next) => {
 
     res.status(200).json({createdUser});
 };
+
 export const login = async (req, res, next) => {
 
     const { email, password } = req.body; 

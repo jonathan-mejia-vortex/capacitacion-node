@@ -1,9 +1,10 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, BaseEntity, ObjectIdColumn, ManyToOne, ObjectId, JoinColumn } from "typeorm";
+import { User } from "./User";
 
 @Entity()
 export class Place extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number
+    @ObjectIdColumn()
+    _id: ObjectId
 
     @Column()
     title: string
@@ -23,7 +24,8 @@ export class Place extends BaseEntity {
         lng: number
     }
 
-    @Column()
-    creator: string
+    @ManyToOne(() => User, (user) => user.places)
+    @JoinColumn({name: 'user_id', referencedColumnName: '_id'})
+    creator: User
 }
 

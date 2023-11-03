@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, ObjectId, ObjectIdColumn } from "typeorm";
+import { Entity, Column, BaseEntity, ObjectId, ObjectIdColumn, OneToMany } from "typeorm";
 import { Place } from "./Place";
 
 @Entity()
@@ -18,9 +18,6 @@ export class User extends BaseEntity {
     @Column()
     password: string
 
-    @Column()
-    creator: string
-
-    @Column()
+    @OneToMany(() => Place, (place) => place.creator)
     places: Place[]
 };
