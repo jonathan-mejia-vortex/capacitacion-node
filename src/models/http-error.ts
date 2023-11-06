@@ -1,9 +1,11 @@
-export class HttpError {
-    message: string;
-    code?: number;
-
+class HttpError extends Error {
+    code: number;
+  
     constructor(message: string, errorCode: number) {
-        this.message = message;
-        this.code = errorCode;
+      super(message);
+      this.code = errorCode;
     }
-}
+  }
+  
+  export default HttpError;
+  
