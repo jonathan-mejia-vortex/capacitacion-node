@@ -4,25 +4,22 @@ import { getCoordsForAdress } from '../utils/location';
 import { Place } from '../models/place';
 import { User } from '../models/user';
 import mongoose from 'mongoose';
+import { NextFunction, Request, Response } from 'express';
+import PlaceService from '../src/services/place.service';
 
-export const getPlaceById = async (req, res, next) => {
-    const placeId = req.params.pid;
-    let place;
+export const getPlaceById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-        place = await Place.findById(placeId);
-    } catch (error) {
-        const errorHttp = new HttpError(
-            'Something went wrong, could not find a place', 500
-        );
-        return next(errorHttp);
+      const placeId = req.params.pid;
+      const place = await PlaceService.getPlaceById(placeId);
+      res.status(200).json({ place });
+    } catch (err) {
+      next(err);
     }
-
-    if(!place){
-        const errorHttp = new HttpError('Could not find a place for the provided id.', 404);
-        return next(errorHttp);
-    } 
-    res.json({place: place.toObject( { getters: true})});
-};
+  };
 
 // An alternative
 // export const getPlacesByUserId = async (req, res, next) => {
