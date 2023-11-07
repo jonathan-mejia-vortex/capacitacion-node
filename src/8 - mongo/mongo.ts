@@ -1,10 +1,11 @@
 import { MongoClient } from "mongodb";
-import { MONGO_DB_PW } from "../../utils/keys";
+import { MONGO_DB_PW } from "../utils/keys";
+import { NextFunction, Request, Response } from 'express';
 
 const url = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
 const PRODUCT_COLLECTION_NAME = 'products';
 
-export const createProduct = async (req, res, next) => {
+export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
     const newProduct = {
         name: req.body.name,
         price: req.body.price
@@ -22,7 +23,7 @@ export const createProduct = async (req, res, next) => {
     res.json({newProduct});
 };
 
-export const getProducts = async (req, res, next) => {
+export const getProducts = async (req: Request, res: Response, next: NextFunction) => {
     const client = new MongoClient(url);
     let products;
     try {

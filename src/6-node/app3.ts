@@ -1,7 +1,9 @@
+import { NextFunction, Request, Response } from 'express';
+
 const expr = require('express');
 const appExpr = expr();
 
-appExpr.use((req, res, next) => {
+appExpr.use((req: Request, res: Response, next: NextFunction) => {
     let body:String = '';
     req.on('end', () => {
         const userName = body.split('=')[1];
@@ -15,7 +17,7 @@ appExpr.use((req, res, next) => {
     });
 });
 
-appExpr.use((req, res, next) => {
+appExpr.use((req: Request, res: Response, next: NextFunction) => {
     if(req.body){
         return res.send('<h1> User: ' + req.body.name + '</h1>');
     }

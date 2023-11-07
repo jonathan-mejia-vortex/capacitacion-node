@@ -1,6 +1,6 @@
 import express, { Router } from "express";
-import { createProduct, getProducts } from "../src/8 - mongo/mongo";
-import { createProduct2, getProducts2 } from "../src/8 - mongo/mongoose";
+import { createProduct, getProducts } from "../8 - mongo/mongo";
+import { createProduct2, getProducts2 } from "../8 - mongo/mongoose";
 
 const router: Router = express.Router();
 

@@ -1,8 +1,11 @@
-export interface Place{
+export interface Place {
     title: string;
     description: string;
     image: string;
     address: string;
-    location: string;
+    location: {
+        lat: number,
+        lng: number
+    };
     creator: string;
 }

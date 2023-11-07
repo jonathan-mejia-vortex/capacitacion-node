@@ -1,11 +1,11 @@
-import express, { Request, Response } from 'express';
-import { HttpError } from '../models/http-error';
+import express, { Request, Response, NextFunction } from 'express';
+import { HttpError } from './models/http-error';
 import bodyParser from 'body-parser';
-import { userRoutes } from '../routes/users-routes';
-import { placesRoutes } from '../routes/places-routes';
-import { productsRoutes } from '../routes/products-routes';
+import { userRoutes } from './routes/users-routes';
+import { placesRoutes } from './routes/places-routes';
+import { productsRoutes } from './routes/products-routes';
 import mongoose from 'mongoose';
-import { MONGO_DB_PW } from './../utils/keys';
+import { MONGO_DB_PW } from './utils/keys';
 
 const URL = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
 
@@ -22,12 +22,12 @@ app.use('/api/places/', placesRoutes);
 app.use('/api/users/', userRoutes);
 app.use('/api/products/', productsRoutes);
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     const error = new HttpError('Could not find this route.', 404);
     throw error;
 });
 
-app.use((error, req, res, next) => {
+app.use((error, req: Request, res: Response, next: NextFunction) => {
   if(res.headersSent){
       return next(error);
   }

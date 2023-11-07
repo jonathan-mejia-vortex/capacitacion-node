@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
-import { Product } from "../../models/product";
-import { MONGO_DB_PW } from "../../utils/keys";
+import { Product } from "../models/product";
+import { MONGO_DB_PW } from "../utils/keys";
+import { NextFunction, Request, Response } from 'express';
 
 const url = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongodb.net/?retryWrites=true&w=majority';
 
@@ -12,7 +13,7 @@ const url = 'mongodb+srv://alejozonta:' + MONGO_DB_PW + '@cluster0.citg00o.mongo
 //         console.log('Connection failed!')
 //     });
 
-export const createProduct2 = async (req, res, next) => {
+export const createProduct2 = async (req: Request, res: Response, next: NextFunction) => {
     const createdProduct = new Product({
         name: req.body.name,
         price: req.body.price
@@ -28,7 +29,7 @@ export const createProduct2 = async (req, res, next) => {
     res.json(result);
 };
 
-export const getProducts2 = async (req, res, next) => {
+export const getProducts2 = async (req: Request, res: Response, next: NextFunction) => {
     const products = await Product.find().exec();
 
     res.json(products);
