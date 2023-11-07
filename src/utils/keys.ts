@@ -1,1 +1,1 @@
-export const MONGO_DB_PW = 'U1e6BZPH25wSrMhJ';
+export const MONGO_DB_PW = 'I2R49Y6aNSh0ksBK';

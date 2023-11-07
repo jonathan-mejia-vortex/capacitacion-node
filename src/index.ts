@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { HttpError } from './utils/http-error';
 import bodyParser from 'body-parser';
-import { userRoutes } from '../routes/users-routes';
-import { placesRoutes } from '../routes/places-routes';
+import { userRoutes } from './routes/users-routes';
+import { placesRoutes } from './routes/places-routes';
 import { AppDataSource } from './data-source';
 import "reflect-metadata";
 
