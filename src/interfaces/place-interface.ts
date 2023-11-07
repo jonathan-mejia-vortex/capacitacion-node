@@ -1,5 +1,3 @@
-import { User } from "../entity/User";
-
 export interface Place {
     title: string;
     description: string;
@@ -9,5 +7,5 @@ export interface Place {
         lat: number,
         lng: number
     };
-    creator: User;
+    creatorId: string;
 }

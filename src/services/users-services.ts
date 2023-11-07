@@ -27,7 +27,6 @@ class UserService {
         createdUser.email = email;
         createdUser.password = password;
         createdUser.image = 'image';
-        createdUser.places = [];
 
         await AppDataSource.mongoManager.save(createdUser);
 

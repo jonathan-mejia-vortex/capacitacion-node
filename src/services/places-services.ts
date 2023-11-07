@@ -14,17 +14,9 @@ class PlaceService {
         return place;
     }
 
-    /* NOT WORKING */
     static async getPlacesByUserId(userId: string): Promise<IPlace[]> {
         const places = await AppDataSource.mongoManager.find(Place, 
-            {
-                where: {
-                    creator: {
-                        _id: new ObjectId(userId)
-                    }
-                },
-                relations: ['creator']
-            }
+            { creatorId: userId }
         );
 
         if(!places || places.length === 0)
@@ -58,27 +50,16 @@ class PlaceService {
         createdPlace.address = address;
         createdPlace.image = image;
         createdPlace.location = coordinates;
-        createdPlace.creator = user;
+        createdPlace.creatorId = creator;
 
         console.log("User creating Place: ", user);
 
 
         return await AppDataSource.mongoManager.transaction(async (transactionalEntityManager) => {
             createdPlace._id = (await transactionalEntityManager.save(createdPlace))._id;
-    
-            let places = user.places;
-            if(!places)
-                places = [];
-            
-            places.push(createdPlace);
-    
-            transactionalEntityManager.update(User,
-                { _id: createdPlace.creator._id },
-                {  places: places }
-            ).then(() => {
-                callback(createdPlace)
-            }).catch(onRejected => callbackError(onRejected));
-        });
+        }).then(() => {
+            callback(createdPlace)
+        }).catch(onRejected => callbackError(onRejected));;
     }
 
     static async updatePlace(
@@ -89,22 +70,20 @@ class PlaceService {
         await AppDataSource.mongoManager.updateOne(Place,
             { _id: new ObjectId(placeId) },
             { $set: { title: title, description: description } },
-            { upsert: true }
+            { upsert: false }
         );
         const place = await AppDataSource.mongoManager.findOneBy(Place, { _id: new ObjectId(placeId)});
         
         return place;
     };
 
-    /* NOT WORKING */
     static async deletePlace(
         placeId: string,
         callback: (place) => any,
         callbackError: (onRejected) => any): Promise<IPlace> {
     
         const place = await AppDataSource.mongoManager.findOne(Place, {
-            where: { _id: new ObjectId(placeId)},
-            relations: ['creator']
+            where: { _id: new ObjectId(placeId)}
         });
 
         if(!place){
@@ -113,13 +92,14 @@ class PlaceService {
             );
         }
 
+        const user = await AppDataSource.mongoManager.findOne(User, {
+            where: { _id: new ObjectId(place.creatorId)},
+        });
+
         return await AppDataSource.mongoManager.transaction(async (transactionalEntityManager) => {
-            let user = await transactionalEntityManager.findOneBy(User, { _id: place.creator._id});
-            user.places.filter(p => p._id.id.toString() !== placeId)
             transactionalEntityManager.delete(Place, place);
-            transactionalEntityManager.save(User, place.creator)
         })
-        .then(callback)
+        .then(() => callback(place))
         .catch(onRejected => callbackError(onRejected));
     };
 }

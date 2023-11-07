@@ -24,8 +24,8 @@ export class Place extends BaseEntity {
         lng: number
     }
 
-    @ManyToOne(() => User, (user) => user.places)
-    @JoinColumn({name: 'user_id', referencedColumnName: '_id'})
-    creator: User
+    @Column()
+    creatorId: string;
+
 }
 

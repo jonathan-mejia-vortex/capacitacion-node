@@ -44,7 +44,6 @@ export const createPlace = async (req: Request, res: Response, next: NextFunctio
             coordinates,
             creator,
             (place: Place) => {
-                place.creator.places = [];
                 res.status(201).json({createdPlace: place});
             },
             onRejected => {

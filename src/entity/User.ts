@@ -17,7 +17,4 @@ export class User extends BaseEntity {
 
     @Column()
     password: string
-
-    @OneToMany(() => Place, (place) => place.creator)
-    places: Place[]
 };
