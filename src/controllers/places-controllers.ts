@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+import PlaceService from '../services/place-service';
 import HttpError from '../models/http-error';
 import getCoordsForAddress from '../util/location';
 import Place from '../models/place';
@@ -28,90 +29,110 @@ interface Place {
   image: string;
 }
 
-const getPlaceById = (req: Request, res: Response, next: NextFunction): void => {
+const getPlaceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const placeId = req.params.pid;
-    const place = PlaceService.getPlaceById(placeId);
+    const place = await PlaceService.getPlaceById(placeId);
+    
+    if (!place) {
+      throw new HttpError('Place not found', 404);
+    }
+
+    res.json({ place });
   } catch (error) {
-    res.status(404).json({ error : "Place not found" });
-  }  
+    next(error);
+  }
 };
 
-const getPlacesByUserId = (req: Request, res: Response, next: NextFunction): void => {
-  const userId = req.params.uid;
 
-  const places = DUMMY_PLACES.filter((p) => p.creator === userId);
+const getPlacesByUserId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.params.uid;
+    const places = DUMMY_PLACES.filter((p) => p.creator === userId);
 
-  if (!places || places.length === 0) {
-    return next(new HttpError('Could not find places for the provided user id.', 404));
+    if (!places || places.length === 0) {
+      throw new HttpError('Could not find places for the provided user id.', 404);
+    }
+
+    res.json({ places });
+  } catch (error) {
+    next(error);
   }
-
-  res.json({ places });
 };
 
 const createPlace = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(new HttpError('Invalid inputs passed, please check your data.', 422));
-  }
-
-  const { title, description, address, creator } = req.body;
-
-  let coordinates: { lat: number; lng: number };
   try {
-    coordinates = await getCoordsForAddress(address);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new HttpError('Invalid inputs passed, please check your data.', 422);
+    }
+
+    const { title, description, address, creator } = req.body;
+
+    let coordinates: { lat: number; lng: number };
+    try {
+      coordinates = await getCoordsForAddress(address);
+    } catch (error) {
+      throw error;
+    }
+
+    const createdPlace: Place = {
+      title,
+      description,
+      address,
+      location: coordinates,
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/400px-Empire_State_Building_%28aerial_view%29.jpg',
+      creator,
+      id: uuid(),
+    };
+
+    try {
+      DUMMY_PLACES.push(createdPlace);
+    } catch (err) {
+      throw new HttpError('Creating place failed, please try again.', 500);
+    }
+
+    res.status(201).json({ place: createdPlace });
   } catch (error) {
-    return next(error);
+    next(error);
   }
+};
 
-  const createdPlace: Place = {
-    title,
-    description,
-    address,
-    location: coordinates,
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/400px-Empire_State_Building_%28aerial_view%29.jpg',
-    creator,
-    id: uuid(),
-  };
-
+const updatePlace = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    DUMMY_PLACES.push(createdPlace);
-  } catch (err) {
-    const error = new HttpError('Creating place failed, please try again.', 500);
-    return next(error);
-  }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new HttpError('Invalid inputs passed, please check your data.', 422);
+    }
 
-  res.status(201).json({ place: createdPlace });
+    const { title, description } = req.body;
+    const placeId = req.params.pid;
+
+    const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
+    const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+    updatedPlace.title = title;
+    updatedPlace.description = description;
+
+    DUMMY_PLACES[placeIndex] = updatedPlace;
+
+    res.status(200).json({ place: updatedPlace });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const updatePlace = (req: Request, res: Response, next: NextFunction): void => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new HttpError('Invalid inputs passed, please check your data.', 422);
+const deletePlace = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const placeId = req.params.pid;
+    const index = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+    if (index === -1) {
+      throw new HttpError('Could not find a place for that id.', 404);
+    }
+    DUMMY_PLACES.splice(index, 1);
+    res.status(200).json({ message: 'Deleted place.' });
+  } catch (error) {
+    next(error);
   }
-
-  const { title, description } = req.body;
-  const placeId = req.params.pid;
-
-  const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
-  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
-  updatedPlace.title = title;
-  updatedPlace.description = description;
-
-  DUMMY_PLACES[placeIndex] = updatedPlace;
-
-  res.status(200).json({ place: updatedPlace });
-};
-
-const deletePlace = (req: Request, res: Response, next: NextFunction): void => {
-  const placeId = req.params.pid;
-  const index = DUMMY_PLACES.findIndex((p) => p.id === placeId);
-  if (index === -1) {
-    throw new HttpError('Could not find a place for that id.', 404);
-  }
-  DUMMY_PLACES.splice(index, 1);
-  res.status(200).json({ message: 'Deleted place.' });
 };
 
 export { getPlaceById, getPlacesByUserId, createPlace, updatePlace, deletePlace };
