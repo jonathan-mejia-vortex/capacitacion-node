@@ -31,7 +31,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const { email, password } = req.body; 
         const user = await UserService.login(email, password);
-        res.json({message : 'Logged in!'});
+        res.json({message : 'Logged in!', user});
     } catch (err) {
         next(err);
     };

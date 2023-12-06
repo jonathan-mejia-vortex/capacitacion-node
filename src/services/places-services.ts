@@ -102,7 +102,7 @@ class PlaceService {
         sess.startTransaction();
 
         await place.deleteOne({ session: sess})
-        user.places.filter(p => p !== placeId);
+        user.places.filter(p => p.id !== placeId);
         await  user.save({ session: sess});
 
         await sess.commitTransaction();
