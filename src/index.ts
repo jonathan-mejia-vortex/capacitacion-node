@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { HttpError } from "./models/http-error";
+import fs from "fs";
 import bodyParser from "body-parser";
 import { userRoutes } from "./routes/users-routes";
 import { placesRoutes } from "./routes/places-routes";
@@ -16,6 +17,8 @@ const app = express();
 const port = 5000;
 
 app.use(bodyParser.json());
+
+app.use('/uploads', express.static('uploads'));
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -41,6 +44,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use((error, req: Request, res: Response, next: NextFunction) => {
+  if ((req as any).file) {
+    fs.unlink((req as any).file.path, (err) => {
+      console.log(err);
+    });
+  }
+
   if (res.headersSent) {
     return next(error);
   }
